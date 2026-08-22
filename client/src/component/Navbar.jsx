@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { assets } from '../assets/assets'
+import { useClerk, useUser, UserButton } from '@clerk/clerk-react'
 
 const Navbar = () => {
   const navLinks = [
@@ -12,6 +13,9 @@ const Navbar = () => {
 
   const [isScrolled, setIsScrolled] = React.useState(false)
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
+
+  const { openSignIn } = useClerk()
+  const { user } = useUser()
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +37,7 @@ const Navbar = () => {
           : 'bg-transparent py-4 md:py-6'
       }`}
     >
+
       {/* Logo */}
       <Link to="/">
         <img
@@ -46,6 +51,7 @@ const Navbar = () => {
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-4 lg:gap-8">
+
         {navLinks.map((link) => (
           <Link
             key={link.name}
@@ -79,8 +85,9 @@ const Navbar = () => {
 
       {/* Desktop Right Side */}
       <div className="hidden md:flex items-center gap-4">
+
         {/* Search */}
-        <button>
+        <button type="button">
           <img
             src={assets.searchIcon}
             alt="Search"
@@ -90,18 +97,28 @@ const Navbar = () => {
           />
         </button>
 
-        {/* Login */}
-        <Link
-          to="/login"
-          className="px-8 py-2.5 rounded-full ml-4 bg-black text-white transition-all duration-500"
-        >
-          Login
-        </Link>
+        {/* Authentication */}
+        {user ? (
+          <UserButton > 
+            
+          </UserButton>
+        ) : (
+          <button
+            type="button"
+            onClick={() => openSignIn()}
+            className="px-8 py-2.5 rounded-full ml-4 bg-black text-white transition-all duration-500"
+          >
+            Login
+          </button>
+        )}
       </div>
 
       {/* Mobile Menu Button */}
       <div className="flex items-center gap-3 md:hidden">
-        <button onClick={() => setIsMenuOpen(true)}>
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen(true)}
+        >
           <img
             src={assets.menuIcon}
             alt="Menu"
@@ -120,8 +137,10 @@ const Navbar = () => {
             : '-translate-x-full'
         }`}
       >
+
         {/* Close Button */}
         <button
+          type="button"
           className="absolute top-4 right-4"
           onClick={() => setIsMenuOpen(false)}
         >
@@ -152,15 +171,24 @@ const Navbar = () => {
           Dashboard
         </Link>
 
-        {/* Login */}
-        <Link
-          to="/login"
-          onClick={() => setIsMenuOpen(false)}
-          className="bg-black text-white px-8 py-2.5 rounded-full"
-        >
-          Login
-        </Link>
+        {/* Mobile Authentication */}
+        {user ? (
+          <UserButton />
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setIsMenuOpen(false)
+              openSignIn()
+            }}
+            className="bg-black text-white px-8 py-2.5 rounded-full"
+          >
+            Login
+          </button>
+        )}
+
       </div>
+
     </nav>
   )
 }
